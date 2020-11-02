@@ -40,6 +40,7 @@ default ()
 
 --------------------------------------------------------------------------------
 
+-- | 'HashMap' alias, may reduce ambiguity.
 type LHashMap = HashMap
 
 --------------------------------------------------------------------------------
@@ -87,9 +88,13 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
     
     (//) = toMap ... (++) . assocs
     keys = H.keys
+    
+    kfoldl = H.foldlWithKey' . flip
+    kfoldr = H.foldrWithKey
 
 --------------------------------------------------------------------------------
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Lazy."
+
 

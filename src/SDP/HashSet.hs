@@ -30,8 +30,6 @@ import SDP.Set
 import qualified Data.HashSet as H
 import Data.HashSet ( HashSet )
 
-import Data.Function
-
 default ()
 
 --------------------------------------------------------------------------------
@@ -91,5 +89,7 @@ instance (Eq e, Hashable e) => Set (HashSet e) e
     lookupGT e = lookupGT e . H.toList
     lookupLE e = lookupLE e . H.toList
     lookupGE e = lookupGE e . H.toList
+
+
 
 

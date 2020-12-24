@@ -31,7 +31,6 @@ import SDP.Map
 import qualified Data.HashMap.Strict as H
 import Data.HashMap.Strict ( HashMap )
 
-import Data.Function
 import Data.Maybe
 
 import Control.Exception.SDP
@@ -45,8 +44,6 @@ type SHashMap = HashMap
 
 --------------------------------------------------------------------------------
 
-{- Nullable, Estimate and Bordered instances. -}
-
 instance Nullable (HashMap k e)
   where
     isNull = null
@@ -57,8 +54,8 @@ instance (Index k) => Estimate (HashMap k e)
     (<==>) = on (<=>) length
     (.>.)  = on  (>)  length
     (.<.)  = on  (<)  length
-    (.<=.) = on  (<=) length
-    (.>=.) = on  (>=) length
+    (.<=.) = on (<=)  length
+    (.>=.) = on (>=)  length
     
     (<.=>) = (<=>) . length
     (.>)   = (>)   . length
@@ -66,16 +63,14 @@ instance (Index k) => Estimate (HashMap k e)
     (.>=)  = (>=)  . length
     (.<=)  = (<=)  . length
 
---------------------------------------------------------------------------------
-
-{- Map instance. -}
-
 instance (Eq k, Hashable k) => Map (HashMap k e) k e
   where
     toMap' = const toMap
     toMap  = H.fromList
     assocs = H.toList
     
+    kfoldl  = H.foldlWithKey' . flip
+    kfoldr  = H.foldrWithKey
     filter' = H.filterWithKey
     member' = H.member
     insert' = H.insert
@@ -83,18 +78,13 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
     
     -- | Throws 'IndexException' instead 'error' call.
     (!)  = fromMaybe (undEx "(!) {HashMap k e}") ... (!?)
-    (!?) = flip H.lookup
-    
     (//) = toMap ... (++) . assocs
+    (!?) = flip H.lookup
     keys = H.keys
-    
-    kfoldl = H.foldlWithKey' . flip
-    kfoldr = H.foldrWithKey
 
 --------------------------------------------------------------------------------
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Strict."
-
 
 

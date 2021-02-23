@@ -52,16 +52,16 @@ instance Nullable (HashMap k e)
 instance (Index k) => Estimate (HashMap k e)
   where
     (<==>) = on (<=>) length
-    (.>.)  = on  (>)  length
-    (.<.)  = on  (<)  length
     (.<=.) = on (<=)  length
     (.>=.) = on (>=)  length
+    (.>.)  = on (>)   length
+    (.<.)  = on (<)   length
     
     (<.=>) = (<=>) . length
-    (.>)   = (>)   . length
-    (.<)   = (<)   . length
     (.>=)  = (>=)  . length
     (.<=)  = (<=)  . length
+    (.>)   = (>)   . length
+    (.<)   = (<)   . length
 
 instance (Eq k, Hashable k) => Map (HashMap k e) k e
   where
@@ -71,6 +71,7 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
     
     kfoldl  = H.foldlWithKey' . flip
     kfoldr  = H.foldrWithKey
+    
     filter' = H.filterWithKey
     member' = H.member
     insert' = H.insert
@@ -86,5 +87,4 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Strict."
-
 

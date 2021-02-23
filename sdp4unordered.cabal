@@ -32,18 +32,18 @@ Library
   hs-source-dirs:   src
   
   build-depends:
-    base         >= 4.12 && < 5,
-    sdp          >= 0.2  && < 1,
-    sdp-hashable >= 0.2  && < 1,
-    
+    base                 >= 4.12 && < 5,
+    sdp                  >= 0.2  && < 1,
+    sdp-hashable         >= 0.2  && < 1,
     unordered-containers >= 0.2 && < 0.3
   
-  ghc-options: -Wall -Wno-orphans
+  ghc-options: -Wall -Wno-orphans -Wcompat
   
   exposed-modules:
     SDP.HashMap.Strict
     SDP.HashMap.Lazy
     SDP.HashSet
+
 
 
 

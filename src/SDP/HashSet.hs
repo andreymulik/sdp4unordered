@@ -41,7 +41,7 @@ instance Nullable (HashSet e)
     isNull = null
     lzero  = H.empty
 
-instance Estimate (HashSet e)
+instance (Eq e, Hashable e) => Estimate (HashSet e)
   where
     (<==>) = on (<=>) sizeOf
     (.<=.) = on (<=)  sizeOf
@@ -55,12 +55,12 @@ instance Estimate (HashSet e)
     (.>)   = (>)   . sizeOf
     (.<)   = (<)   . sizeOf
 
-instance Bordered (HashSet e) Int
+instance (Eq e, Hashable e) => Bordered (HashSet e) Int
   where
-    sizeOf = length
-    
-    upper xs = length xs - 1
-    lower  _ = 0
+    lower    _ = 0
+    sizeOf     = length
+    upper   xs = length xs - 1
+    rebound bs = H.fromList . rebound (H.toList bs)
 
 --------------------------------------------------------------------------------
 

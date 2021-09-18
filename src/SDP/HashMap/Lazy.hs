@@ -2,7 +2,7 @@
 
 {- |
     Module      :  SDP.HashMap.Lazy
-    Copyright   :  (c) Andrey Mulik 2020
+    Copyright   :  (c) Andrey Mulik 2020-2021
     License     :  BSD-style
     Maintainer  :  work.a.mulik@gmail.com
     Portability :  portable
@@ -44,10 +44,7 @@ type LHashMap = HashMap
 
 --------------------------------------------------------------------------------
 
-instance Nullable (HashMap k e)
-  where
-    isNull = null
-    lzero  = H.empty
+instance Nullable (HashMap k e) where isNull = null; lzero = H.empty
 
 instance (Index k) => Estimate (HashMap k e)
   where
@@ -65,12 +62,14 @@ instance (Index k) => Estimate (HashMap k e)
 
 instance (Eq k, Hashable k) => Map (HashMap k e) k e
   where
+    update' es f key = H.update (Just . f) key es
+    write'  es key e = H.insert key e es
+    
+    kfoldl = H.foldlWithKey' . flip
+    kfoldr = H.foldrWithKey
     toMap' = const toMap
     toMap  = H.fromList
     assocs = H.toList
-    
-    kfoldl  = H.foldlWithKey' . flip
-    kfoldr  = H.foldrWithKey
     
     filter' = H.filterWithKey
     member' = H.member
@@ -87,4 +86,5 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Lazy."
+
 

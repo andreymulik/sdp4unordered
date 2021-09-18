@@ -2,7 +2,7 @@
 
 {- |
     Module      :  SDP.HashMap.Strict
-    Copyright   :  (c) Andrey Mulik 2020
+    Copyright   :  (c) Andrey Mulik 2020-2021
     License     :  BSD-style
     Maintainer  :  work.a.mulik@gmail.com
     Portability :  portable
@@ -30,7 +30,6 @@ import SDP.Map
 
 import qualified Data.HashMap.Strict as H
 import Data.HashMap.Strict ( HashMap )
-
 import Data.Maybe
 
 import Control.Exception.SDP
@@ -44,10 +43,7 @@ type SHashMap = HashMap
 
 --------------------------------------------------------------------------------
 
-instance Nullable (HashMap k e)
-  where
-    isNull = null
-    lzero  = H.empty
+instance Nullable (HashMap k e) where isNull = null; lzero = H.empty
 
 instance (Index k) => Estimate (HashMap k e)
   where
@@ -65,17 +61,19 @@ instance (Index k) => Estimate (HashMap k e)
 
 instance (Eq k, Hashable k) => Map (HashMap k e) k e
   where
+    update' es f key = H.update (Just . f) key es
+    write'  es key e = H.insert key e es
+    
+    kfoldl = H.foldlWithKey' . flip
+    kfoldr = H.foldrWithKey
     toMap' = const toMap
     toMap  = H.fromList
-    assocs = H.toList
-    
-    kfoldl  = H.foldlWithKey' . flip
-    kfoldr  = H.foldrWithKey
     
     filter' = H.filterWithKey
     member' = H.member
     insert' = H.insert
     delete' = H.delete
+    assocs  = H.toList
     
     -- | Throws 'IndexException' instead 'error' call.
     (!)  = fromMaybe (undEx "(!) {HashMap k e}") ... (!?)
@@ -87,4 +85,6 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Strict."
+
+
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe, MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE Safe, CPP, MultiParamTypeClasses, FlexibleInstances #-}
 
 {- |
     Module      :  SDP.HashMap.Strict
@@ -24,6 +24,7 @@ where
 
 import Prelude ()
 import SDP.SafePrelude
+import SDP.Forceable
 import SDP.Hashable
 import SDP.Linear
 import SDP.Map
@@ -43,7 +44,13 @@ type SHashMap = HashMap
 
 --------------------------------------------------------------------------------
 
+{- Nullable, Forceable and Estimate instances. -}
+
 instance Nullable (HashMap k e) where isNull = null; lzero = H.empty
+
+#if MIN_VERSION_sdp(0,3,0)
+instance Forceable (HashMap k e)
+#endif
 
 instance (Index k) => Estimate (HashMap k e)
   where
@@ -85,6 +92,4 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Strict."
-
-
 

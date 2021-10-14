@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe, MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE Safe, CPP, MultiParamTypeClasses, FlexibleInstances #-}
 
 {- |
     Module      :  SDP.HashMap.Lazy
@@ -24,6 +24,7 @@ where
 
 import Prelude ()
 import SDP.SafePrelude
+import SDP.Forceable
 import SDP.Hashable
 import SDP.Linear
 import SDP.Map
@@ -43,6 +44,10 @@ default ()
 type LHashMap = HashMap
 
 --------------------------------------------------------------------------------
+
+#if MIN_VERSION_sdp(0,3,0)
+instance Forceable (HashMap k e)
+#endif
 
 instance Nullable (HashMap k e) where isNull = null; lzero = H.empty
 

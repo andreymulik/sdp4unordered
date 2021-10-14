@@ -1,8 +1,8 @@
-{-# LANGUAGE Safe, MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE Safe, CPP, MultiParamTypeClasses, FlexibleInstances #-}
 
 {- |
     Module      :  SDP.HashSet
-    Copyright   :  (c) Andrey Mulik 2020
+    Copyright   :  (c) Andrey Mulik 2020-2021
     License     :  BSD-style
     Maintainer  :  work.a.mulik@gmail.com
     Portability :  portable
@@ -23,6 +23,7 @@ where
 
 import Prelude ()
 import SDP.SafePrelude
+import SDP.Forceable
 import SDP.Hashable
 import SDP.Linear
 import SDP.Set
@@ -34,12 +35,13 @@ default ()
 
 --------------------------------------------------------------------------------
 
-{- Nullable, Estimate and Bordered instances. -}
+{- Nullable, Forceable, Estimate and Bordered instances. -}
 
-instance Nullable (HashSet e)
-  where
-    isNull = null
-    lzero  = H.empty
+instance Nullable (HashSet e) where isNull = null; lzero = H.empty
+
+#if MIN_VERSION_sdp(0,3,0)
+instance Forceable (HashSet e)
+#endif
 
 instance (Eq e, Hashable e) => Estimate (HashSet e)
   where
@@ -67,6 +69,9 @@ instance (Eq e, Hashable e) => Bordered (HashSet e) Int
 instance (Eq e, Hashable e) => Set (HashSet e) e
   where
     set    = id -- always correct
+    (/\)   = H.intersection
+    (\\)   = H.difference
+    (\/)   = H.union
     member = H.member
     insert = H.insert
     delete = H.delete
@@ -75,10 +80,6 @@ instance (Eq e, Hashable e) => Set (HashSet e) e
     symdiffs      = foldr1 (\^/)
     differences   = foldr1 (/\)
     intersections = foldr1 (\\)
-    
-    (/\) = H.intersection
-    (\\) = H.difference
-    (\/) = H.union
     
     xs \^/ ys = (xs \/ ys) \\ (xs /\ ys)
     xs \+/ ys = isNull (ys \\ xs)
@@ -89,7 +90,6 @@ instance (Eq e, Hashable e) => Set (HashSet e) e
     lookupGT e = lookupGT e . H.toList
     lookupLE e = lookupLE e . H.toList
     lookupGE e = lookupGE e . H.toList
-
 
 
 

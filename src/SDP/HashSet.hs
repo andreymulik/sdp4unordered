@@ -23,7 +23,6 @@ where
 
 import Prelude ()
 import SDP.SafePrelude
-import SDP.Forceable
 import SDP.Hashable
 import SDP.Linear
 import SDP.Set
@@ -62,7 +61,9 @@ instance (Eq e, Hashable e) => Bordered (HashSet e) Int
     lower    _ = 0
     sizeOf     = length
     upper   xs = length xs - 1
-    rebound bs = H.fromList . rebound (H.toList bs)
+#if MIN_VERSION_sdp(0,3,0)
+    rebound bs = H.fromList . rebound bs . H.toList
+#endif
 
 --------------------------------------------------------------------------------
 
@@ -90,6 +91,5 @@ instance (Eq e, Hashable e) => Set (HashSet e) e
     lookupGT e = lookupGT e . H.toList
     lookupLE e = lookupLE e . H.toList
     lookupGE e = lookupGE e . H.toList
-
 
 

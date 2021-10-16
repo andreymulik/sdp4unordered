@@ -24,7 +24,6 @@ where
 
 import Prelude ()
 import SDP.SafePrelude
-import SDP.Forceable
 import SDP.Hashable
 import SDP.Linear
 import SDP.Map
@@ -68,9 +67,10 @@ instance (Index k) => Estimate (HashMap k e)
 
 instance (Eq k, Hashable k) => Map (HashMap k e) k e
   where
+#if MIN_VERSION_sdp(0,3,0)
     update' es f key = H.update (Just . f) key es
     write'  es key e = H.insert key e es
-    
+#endif
     kfoldl = H.foldlWithKey' . flip
     kfoldr = H.foldrWithKey
     toMap' = const toMap

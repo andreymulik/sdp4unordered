@@ -2,7 +2,7 @@
 
 {- |
     Module      :  SDP.HashMap.Lazy
-    Copyright   :  (c) Andrey Mulik 2020-2021
+    Copyright   :  (c) Andrey Mulik 2020-2022
     License     :  BSD-style
     Maintainer  :  work.a.mulik@gmail.com
     Portability :  portable
@@ -48,9 +48,12 @@ type LHashMap = HashMap
 instance Forceable (HashMap k e)
 #endif
 
-instance Nullable (HashMap k e) where isNull = null; lzero = H.empty
+instance Nullable (HashMap k e)
+  where
+    isNull = null
+    lzero  = H.empty
 
-instance (Index k) => Estimate (HashMap k e)
+instance Index k => Estimate (HashMap k e)
   where
     (<==>) = on (<=>) length
     (.<=.) = on (<=)  length
@@ -63,6 +66,10 @@ instance (Index k) => Estimate (HashMap k e)
     (.<=)  = (<=)  . length
     (.>)   = (>)   . length
     (.<)   = (<)   . length
+    
+#if MIN_VERSION_sdp(0,3,0)
+    sizeOf = length
+#endif
 
 instance (Eq k, Hashable k) => Map (HashMap k e) k e
   where
@@ -92,4 +99,7 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Lazy."
+
+
+
 

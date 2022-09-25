@@ -2,7 +2,7 @@
 
 {- |
     Module      :  SDP.HashSet
-    Copyright   :  (c) Andrey Mulik 2020-2021
+    Copyright   :  (c) Andrey Mulik 2020-2022
     License     :  BSD-style
     Maintainer  :  work.a.mulik@gmail.com
     Portability :  portable
@@ -34,9 +34,12 @@ default ()
 
 --------------------------------------------------------------------------------
 
-{- Nullable, Forceable, Estimate and Bordered instances. -}
+{- Nullable, Forceable and Estimate instances. -}
 
-instance Nullable (HashSet e) where isNull = null; lzero = H.empty
+instance Nullable (HashSet e)
+  where
+    isNull = null
+    lzero  = H.empty
 
 #if MIN_VERSION_sdp(0,3,0)
 instance Forceable (HashSet e)
@@ -55,17 +58,29 @@ instance (Eq e, Hashable e) => Estimate (HashSet e)
     (.<=)  = (<=)  . sizeOf
     (.>)   = (>)   . sizeOf
     (.<)   = (<)   . sizeOf
-
-instance (Eq e, Hashable e) => Bordered (HashSet e) Int
-  where
-    lower    _ = 0
-    sizeOf     = length
-    upper   xs = length xs - 1
+    
 #if MIN_VERSION_sdp(0,3,0)
-    rebound bs = H.fromList . rebound bs . H.toList
+    sizeOf = length
 #endif
 
 --------------------------------------------------------------------------------
+
+{- Bordered instance. -}
+
+instance (Eq e, Hashable e) => Bordered (HashSet e) Int
+  where
+    lower  _ = 0
+    upper xs = length xs - 1
+    
+#if MIN_VERSION_sdp(0,3,0)
+    rebound bs = H.fromList . rebound bs . H.toList
+#else
+    sizeOf = length
+#endif
+
+--------------------------------------------------------------------------------
+
+{- Set instance. -}
 
 instance (Eq e, Hashable e) => Set (HashSet e) e
   where

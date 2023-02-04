@@ -1,4 +1,5 @@
-{-# LANGUAGE Safe, CPP, MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE Safe, CPP, BangPatterns #-}
 
 {- |
     Module      :  SDP.HashMap.Strict
@@ -29,6 +30,7 @@ import SDP.Linear
 import SDP.Map
 
 import qualified Data.HashMap.Strict as H
+
 import Data.HashMap.Strict ( HashMap )
 import Data.Maybe
 
@@ -54,7 +56,7 @@ instance Nullable (HashMap k e)
 instance Forceable (HashMap k e)
 #endif
 
-instance Index k => Estimate (HashMap k e)
+instance Estimate (HashMap k e)
   where
     (<==>) = on (<=>) length
     (.<=.) = on (<=)  length
@@ -90,6 +92,15 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
     delete' = H.delete
     assocs  = H.toList
     
+    union'' = H.unionWithKey
+    
+    difference'' f xs ys = H.foldlWithKey' (\ m k !v -> case H.lookup k ys of
+        Just  w -> maybe m (\ !y -> H.insert k y m) (f k v w)
+        Nothing -> H.insert k v m
+      ) Z xs
+    
+    intersection'' = H.intersectionWithKey
+    
     -- | Throws 'IndexException' instead 'error' call.
     (!)  = fromMaybe (undEx "(!) {HashMap k e}") ... (!?)
     (//) = toMap ... (++) . assocs
@@ -100,6 +111,5 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
 
 undEx :: String -> a
 undEx =  throw . UndefinedValue . showString "in SDP.HashMap.Strict."
-
 
 

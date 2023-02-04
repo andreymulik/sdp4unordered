@@ -1,4 +1,5 @@
-{-# LANGUAGE Safe, CPP, MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE Safe, CPP, BangPatterns #-}
 
 {- |
     Module      :  SDP.HashMap.Lazy
@@ -53,7 +54,7 @@ instance Nullable (HashMap k e)
     isNull = null
     lzero  = H.empty
 
-instance Index k => Estimate (HashMap k e)
+instance Estimate (HashMap k e)
   where
     (<==>) = on (<=>) length
     (.<=.) = on (<=)  length
@@ -88,6 +89,15 @@ instance (Eq k, Hashable k) => Map (HashMap k e) k e
     member' = H.member
     insert' = H.insert
     delete' = H.delete
+    
+    union'' = H.unionWithKey
+    
+    difference'' f xs ys = H.foldlWithKey' (\ m k !v -> case H.lookup k ys of
+        Just  w -> maybe m (\ !y -> H.insert k y m) (f k v w)
+        Nothing -> H.insert k v m
+      ) Z xs
+    
+    intersection'' = H.intersectionWithKey
     
     -- | Throws 'IndexException' instead 'error' call.
     (!)  = fromMaybe (undEx "(!) {HashMap k e}") ... (!?)

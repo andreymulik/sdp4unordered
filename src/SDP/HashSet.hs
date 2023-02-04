@@ -73,7 +73,7 @@ instance (Eq e, Hashable e) => Bordered (HashSet e) Int
     upper xs = length xs - 1
     
 #if MIN_VERSION_sdp(0,3,0)
-    rebound bs = H.fromList . rebound bs . H.toList
+    viewOf bs = H.fromList . viewOf bs . H.toList
 #else
     sizeOf = length
 #endif
